@@ -1,12 +1,15 @@
 <? 
 
+    require_once './Config.php';
+
     class Database {
 
-        private $db_host;
-        private $db_user;
-        private $db_user_pwd;
-        private $db_port;
-        private $db_name;
+        private $db_host = DB_HOST;
+        private $db_user = DB_USER;
+        private $db_user_pwd = DB_USER_PWD;
+        private $db_port = DB_PORT;
+        private $db_name = DB_NAME;
+        
         protected $Dbh;
 
         
