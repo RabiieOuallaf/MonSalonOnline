@@ -1,6 +1,6 @@
-<? 
+<?php
 
-    require_once './Config.php';
+    require_once 'Config.php';
 
     class Database {
 
@@ -26,7 +26,7 @@
             // PDO instance 
 
             try{
-                $this->Dbh = new PDO($dsn , $this->db_user_pwd, $this->db_user, $options);
+                $this->Dbh = new PDO($dsn , $this->db_user,$this->db_user_pwd, $options);
             }catch(PDOException $e){
                 $err = $e->getMessage();
                 echo 'You have an error in your database connection , please check Database.php file, Error message :' .$err;  
