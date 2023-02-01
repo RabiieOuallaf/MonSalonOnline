@@ -35,6 +35,21 @@
             
         }
 
+        // ===  Creating session === //
+
+        public function createSession($user) {
+            session_start();
+
+            $_SESSION["Username"] = $user->user_name;
+            if($user->user_role == "Admin"){
+                $_SESSION["Role"] = $user->user_role;
+                header("location: dashbaord.php");
+            }else{
+                header("location: index.php");
+            }
+            
+        }
+
         // === Registe === //
 
         public function register($userName, $userEmail,$userPwd) {
@@ -73,6 +88,7 @@
             // Fetch data 
 
             $user = $User->login($_POST['Email'] , $_POST['pwd']);
+            createSession($user);
 
             if($user){
                 echo json_encode(array('status' => 'success', 'user' => $user));
