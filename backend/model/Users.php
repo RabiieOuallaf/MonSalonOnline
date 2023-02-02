@@ -42,7 +42,7 @@
 
         // ===  Creating session === //
 
-        public function createSession($user) {
+        protected function createSession($user) {
             session_start();
 
             $_SESSION["Username"] = $user->user_name;
@@ -54,17 +54,20 @@
             }
 
         }
+
+        
+        
         
         public function register($userName, $userEmail, $userPwd){
             
-
+            
             $sql = "INSERT INTO users(user_name, user_email, user_pwd) VALUES (:username, :useremail, :userpwd)";
             $query = $this->Dbh->prepare($sql);
             $query->bindValue(":username", $userName, PDO::PARAM_STR);
             $query->bindValue(":useremail", $userEmail, PDO::PARAM_STR);
             $query->bindValue(":userpwd", $userPwd, PDO::PARAM_STR);
             $userRegisterd = $query->execute();
-
+            
             if(!$userRegisterd){
                 return true;
                 header("location: somewhere");              
@@ -72,6 +75,21 @@
                 return false;
             }
             
+        }
+        
+        // === Generate the login reference key === // 
+
+        public function generateKey() {
+            $str = "ABCDEFGHIJKLMNOPAQRSTUVWXYZ123456789";
+
+            $strLength = strlen($str);
+
+            for($i = 0; $i < $strLength; $i++){
+                $baseRandomString []= $str[mt_rand(0 , $strLength - 1)];
+            }
+
+            echo json_encode($baseRandomString);
+
         }
         
 
@@ -118,7 +136,7 @@
                 break;
 
             default: 
-                break;
+                $User->generateKey();
         }
 
         
