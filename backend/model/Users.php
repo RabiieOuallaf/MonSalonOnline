@@ -80,12 +80,12 @@
         // === Generate the login reference key === // 
 
         public function generateKey() {
-            $str = "ABCDEFGHIJKLMNOPAQRSTUVWXYZ123456789";
+            $str = "78LMNOPAQRSTUVWXYZ";
 
             $strLength = strlen($str);
 
             for($i = 0; $i < $strLength; $i++){
-                $baseRandomString []= $str[mt_rand(0 , $strLength - 1)];
+                $baseRandomString []= $str[mt_rand(rand(0,10) , $strLength - 1)];
             }
 
             echo json_encode($baseRandomString);
