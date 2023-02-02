@@ -56,29 +56,22 @@
         }
         
         public function register($userName, $userEmail, $userPwd){
-            if(empty($userName) || empty($userEmail) || empty($userPwd)){
-                
-            }
+            
 
             $sql = "INSERT INTO users(user_name, user_email, user_pwd) VALUES (:username, :useremail, :userpwd)";
             $query = $this->Dbh->prepare($sql);
             $query->bindValue(":username", $userName, PDO::PARAM_STR);
             $query->bindValue(":useremail", $userEmail, PDO::PARAM_STR);
             $query->bindValue(":userpwd", $userPwd, PDO::PARAM_STR);
+            $userRegisterd = $query->execute();
 
-            if(!$query->execute()){
-                return false;                
+            if(!$userRegisterd){
+                return true;
+                header("location: somewhere");              
             }else{
-                $user = $query->fetch(PDO::FETCH_ASSOC);
-
-                if(!empty($user)){
-                    return $user;
-                }else{
-                    return false;
-                }
+                return false;
             }
-
-
+            
         }
         
 
@@ -92,21 +85,44 @@
     if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
         $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-        // var_dump($_POST);
-        // exit;
-        if(isset($_POST['Email']) && isset($_POST['pwd'])){
-            // Fetch data 
-            $user = $User->login($_POST['Email'] , $_POST['pwd']);
-           
-            if(!empty($user)){
-                echo json_encode(array('status' => 'success', 'user' => $user));
-            }else {
-                http_response_code(404);
-                echo json_encode(array('status' => 'User does not exsit !'));
+
+        switch ($_POST['type']){
+            case 'login':      
+
+                if(isset($_POST['Email']) && isset($_POST['pwd'])){
+                    // Fetch data 
+                    $user = $User->login($_POST['Email'] , $_POST['pwd']);
                 
-            }
+                    if(!empty($user)){
+                        echo json_encode(array('status' => 'success', 'user' => $user));
+                    }else {
+                        http_response_code(404);
+                        echo json_encode(array('status' => 'User does not exsit !'));
+                        
+                    }
+                }
+                break;
+            case 'register':
+
+                if(isset($_POST['Email']) || !empty($_POST['username']) || !empty($_POST['pwd'])){
+                    $user = $User->register($_POST['username'] , $_POST['Email'] , $_POST['pwd']);
+
+                    if(!$user){
+                        http_response_code(200);
+                        echo json_encode(array('status' => 'user created successfully' , 'user' => $user));
+                    }else{
+                        http_response_code(404);
+                        echo json_encode(array('status' => 'something went wrong!'));
+                    }
+                }
+                break;
+
+            default: 
+                break;
         }
 
+        
+
     }else {
-        echo json_encode("The request method isn't correct!");
+        echo json_encode("The request method isn't valid!");
     }
