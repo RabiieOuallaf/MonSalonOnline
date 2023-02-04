@@ -12,8 +12,7 @@
             $query = $this->Dbh->prepare("SELECT * FROM users WHERE user_refernce = :userrefernce");
 
             $query->bindValue(':userrefernce', $userRefernce, PDO::PARAM_STR);
-
-                     
+     
             if(!$query->execute()){
                 error_log("Error in banding the params : " . $query->errorInfo());
                 return false;
@@ -21,10 +20,6 @@
             
                 $user = $query->fetch(PDO::FETCH_ASSOC);
 
-                // $query->execute();
-                // $User = $query->fetch(PDO::FETCH_OBJ);
-                // return $User;
-                // $this->createSession($User);
                 if(!empty($user)){
                     return $user;
                 }else{
@@ -81,7 +76,6 @@
 
         public function generateKey() {
             $str = "78LmNOPAQRsUvwXYZ";
-
             $strLength = strlen($str);
 
             for($i = 0; $i < mt_rand(10,14); $i++){
