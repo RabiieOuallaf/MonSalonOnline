@@ -64,7 +64,17 @@
 
         }
 
-        
+        // === displayReservations === // 
+
+        public function displayReservations(){
+
+            $sql = "SELECT * FROM reservations";
+            $preparedSQL = $this->Dbh->prepare($sql);
+            $preparedSQL->execute();
+            $reservations = $preparedSQL->fetchAll(PDO::FETCH_OBJ);
+            echo json_encode(array("reservations list :" => $reservations));
+
+        }
     }
 
     $Reservation = new Reservations;
@@ -121,6 +131,11 @@
                     }
                 }
                 break;
+
+            default :
+                $Reservation->displayReservations();
+                break;
+                
         }
     }
 
