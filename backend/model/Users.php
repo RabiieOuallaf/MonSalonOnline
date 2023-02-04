@@ -7,16 +7,11 @@
 
         // === Login === //
 
-        public function login($userName, $userPwd) {
-            //  echo json_encode([
-            //     "email" => $userName,
-            //     "pwd" => $userPwd
-            // ]);
-            // exit;
-            $query = $this->Dbh->prepare("SELECT * FROM users WHERE user_email = '$userName' AND user_pwd = '$userPwd'");
+        public function login($userRefernce) {
 
-            $query->bindValue(':username', $userName, PDO::PARAM_STR);
-            $query->bindValue(':userpwd', $userPwd, PDO::PARAM_STR); // bindParam returns a boolen
+            $query = $this->Dbh->prepare("SELECT * FROM users WHERE user_refernce = :userrefernce");
+
+            $query->bindValue(':userrefernce', $userRefernce, PDO::PARAM_STR);
 
                      
             if(!$query->execute()){
@@ -61,18 +56,23 @@
         public function register($userName, $userEmail, $userPwd){
             
             
-            $sql = "INSERT INTO users(user_name, user_email, user_pwd) VALUES (:username, :useremail, :userpwd)";
+            $sql = "INSERT INTO users(user_name, user_email, user_pwd, user_refernce) VALUES (:username, :useremail, :userpwd, :userrefernce)";
+
             $query = $this->Dbh->prepare($sql);
             $query->bindValue(":username", $userName, PDO::PARAM_STR);
             $query->bindValue(":useremail", $userEmail, PDO::PARAM_STR);
             $query->bindValue(":userpwd", $userPwd, PDO::PARAM_STR);
+            $query->bindValue(":userrefernce" , $this->generateKey(), PDO::PARAM_STR);
+
             $userRegisterd = $query->execute();
             
             if(!$userRegisterd){
-                return true;
+                return false;
                 header("location: somewhere");              
             }else{
-                return false;
+                return $userRegisterd;
+                header("location: somewhere");              
+
             }
             
         }
@@ -88,7 +88,7 @@
                 $baseRandomString []= $str[mt_rand(rand(0,10) , $strLength - 1)];
             }
 
-            echo json_encode(implode($baseRandomString));
+            return implode($baseRandomString);
 
         }
         
@@ -125,7 +125,7 @@
                 if(isset($_POST['Email']) || !empty($_POST['username']) || !empty($_POST['pwd'])){
                     $user = $User->register($_POST['username'] , $_POST['Email'] , $_POST['pwd']);
 
-                    if(!$user){
+                    if($user){
                         http_response_code(200);
                         echo json_encode(array('status' => 'user created successfully' , 'user' => $user));
                     }else{
@@ -136,7 +136,7 @@
                 break;
 
             default: 
-                $User->generateKey();
+                break;
         }
 
         
