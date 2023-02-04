@@ -25,6 +25,46 @@
             }
             
         } 
+
+        // === updateReservation === //
+
+        public function updateReservation($user_refernce, $reservation_service,$reservation_date, $reservation_time,$barber_id) {
+
+            $sql = "UPDATE reservations SET reservation_date = :reservationDate, reservation_time = :reservationTime, reservation_service = :reservationService, reservation_customer_refernce = :customerReference, WHERE barber_id = :barber_id";
+
+            $preparedSQL = $this->Dbh->prepare($sql);
+            
+            $preparedSQL->bindValue(":reservationDate", $reservation_date, PDO::PARAM_STR);
+            $preparedSQL->bindValue(":reservationTime", $reservation_time , PDO::PARAM_INT);
+            $preparedSQL->bindValue(":reservationService", $reservation_service, PDO::PARAM_STR);
+            $preparedSQL->bindValue(":customerReference", $user_refernce, PDO::PARAM_INT);
+            $preparedSQL->bindValue(":barber_id" , $barber_id, PDO::PARAM_INT);
+
+            if($preparedSQL->execute()){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        // === deleteReservation === //
+
+        public function deleteReservation($reservationID){
+
+            $sql = "DELETE FROM reservations WHERE reservation_id = :reservationID";
+            $preparedSQL = $this->Dbh->prepare($sql);
+
+            $preparedSQL->bindValue(":reservationID" , (int)$reservationID, PDO::PARAM_INT);
+
+            if($preparedSQL->execute()){
+                return true;
+            }else{
+                return false;
+            }
+
+        }
+
+        
     }
 
     $Reservation = new Reservations;
@@ -33,6 +73,7 @@
         $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
         switch($_POST["type"]){
+
             case "setReservation":
 
                 if(isset($_POST["reservationDate"]) && isset($_POST["reservationTime"]) && isset($_POST["reservationService"]) && isset($_POST["customerRefernce"]) && isset($_POST["barberID"])){
@@ -47,6 +88,39 @@
                         echo json_encode(array("status" => "reservation setting has faild"));
                     }
                 }
+                break;
+
+            case "updateReservation":
+
+                if(isset($_POST["reservationDate"]) && isset($_POST["reservationTime"]) && isset($_POST["reservationService"]) && isset($_POST["customerRefernce"]) && isset($_POST["barberID"])){
+
+                    $updateReservation = $Reservation->setReservation($_POST["customerRefernce"],$_POST["reservationService"],$_POST["reservationDate"],$_POST["reservationTime"],$_POST["barberID"]);
+
+                    if($updateReservation){
+                        http_response_code(200);
+                        echo json_encode(array("status" => "reservation has been updated seccessfully" , "reservation" => $updateReservation));
+                    }else {
+                        http_response_code(500);
+                        echo json_encode(array("status" => "reservation setting has faild"));
+                    }
+                }
+                break;
+
+
+            case "deleteReservation": 
+                if(isset($_POST["reservationID"])){
+
+                    $updateReservation = $Reservation->deleteReservation((int)$_POST["reservationID"]);
+
+                    if($updateReservation){
+                        http_response_code(200);
+                        echo json_encode(array("status" => "reservation has been deleted seccessfully"));
+                    }else {
+                        http_response_code(500);
+                        echo json_encode(array("status" => "reservation setting has faild"));
+                    }
+                }
+                break;
         }
     }
 
