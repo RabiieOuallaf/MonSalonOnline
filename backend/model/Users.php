@@ -1,6 +1,9 @@
 <?php
-
-    require_once '../core/Database.php';
+    if(file_exists('../core/Database.php')){
+        require_once '../core/Database.php';
+    }else{
+        require_once 'core/Database.php';
+    }
 
 
     class Users extends Database{
@@ -20,7 +23,7 @@
             
                 $user = $query->fetch(PDO::FETCH_ASSOC);
 
-                if(!empty($user)){
+                if(!is_null($user)){
                     return $user;
                 }else{
                     return false;
@@ -51,9 +54,10 @@
         public function register($userName, $userEmail, $userPwd){
             
             
-            $sql = "INSERT INTO users(user_name, user_email, user_pwd, user_refernce) VALUES (:username, :useremail, :userpwd, :userrefernce)";
+            $sql = "INSERT INTO users(user_name,user_email,user_pwd,user_refernce) VALUES (:username, :useremail, :userpwd, :userrefernce)";
 
             $query = $this->Dbh->prepare($sql);
+
             $query->bindValue(":username", $userName, PDO::PARAM_STR);
             $query->bindValue(":useremail", $userEmail, PDO::PARAM_STR);
             $query->bindValue(":userpwd", $userPwd, PDO::PARAM_STR);
@@ -95,46 +99,42 @@
     // Login Endpoint   
 
     if($_SERVER['REQUEST_METHOD'] === 'POST'){
-
-        $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
-
         switch ($_POST['type']){
             case 'login':      
-
-                if(isset($_POST['Email']) && isset($_POST['pwd'])){
+                if(isset($_POST['userrefernce'])){
                     // Fetch data 
-                    $user = $User->login($_POST['Email'] , $_POST['pwd']);
-                
-                    if(!empty($user)){
+                    $user = $User->login($_POST['userrefernce']);
+                    if($user){
                         echo json_encode(array('status' => 'success', 'user' => $user));
                     }else {
                         http_response_code(404);
                         echo json_encode(array('status' => 'User does not exsit !'));
                         
                     }
+                }else{
+                    echo json_encode("please fill out all inputs");
                 }
                 break;
             case 'register':
-
                 if(isset($_POST['Email']) || !empty($_POST['username']) || !empty($_POST['pwd'])){
                     $user = $User->register($_POST['username'] , $_POST['Email'] , $_POST['pwd']);
 
                     if($user){
-                        http_response_code(200);
+                        http_response_code(201);
                         echo json_encode(array('status' => 'user created successfully' , 'user' => $user));
                     }else{
                         http_response_code(404);
                         echo json_encode(array('status' => 'something went wrong!'));
                     }
+                }else{
+                    echo json_encode("please fill out all inputs");
                 }
                 break;
 
             default: 
+                echo json_encode("the request param isn't avialble");
                 break;
         }
-
-        
-
     }else {
         echo json_encode("The request method isn't valid!");
     }
