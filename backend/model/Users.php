@@ -11,6 +11,7 @@
 
 
     class Users extends Database{
+        
 
         // === Login === //
 
@@ -71,13 +72,23 @@
             
             if(!$userRegisterd){
                 return false;
-                header("location: somewhere");              
             }else{
                 return $userRegisterd;
-                header("location: somewhere");              
 
             }
             
+        }
+
+        public function userReferneceKey($userEmail) {
+            $sql = "SELECT * FROM users WHERE user_email = :user_email";
+            $query = $this->Dbh->prepare($sql);
+
+            $query->bindValue(':user_email', $userEmail, PDO::PARAM_STR);
+            if($query->execute()){
+                echo json_encode($query->fetch(PDO::FETCH_OBJ));
+            }else{
+                echo json_encode("something went wrong , please try later");
+            }
         }
         
         // === Generate the login reference key === // 
@@ -103,7 +114,6 @@
     // Login Endpoint   
 
     if($_SERVER['REQUEST_METHOD'] === 'POST'){
-        var_dump($_POST);
         switch ($_POST['type']){
             case 'login':      
                 if(isset($_POST['userrefernce'])){
@@ -125,8 +135,8 @@
                     $user = $User->register($_POST['username'] , $_POST['Email'] , $_POST['pwd']);
 
                     if($user){
-                        http_response_code(201);
-                        echo json_encode(array('status' => 'user created successfully' , 'user' => $user));
+                       $userReference = $User->userReferneceKey($_POST['Email']);
+                       return $userReference;
                     }else{
                         http_response_code(404);
                         echo json_encode(array('status' => 'something went wrong!'));
