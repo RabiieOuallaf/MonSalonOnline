@@ -34,11 +34,11 @@
 
             $preparedSQL = $this->Dbh->prepare($sql);
             
-            $preparedSQL->bindValue(":reservationDate", $reservation_date, PDO::PARAM_STR);
-            $preparedSQL->bindValue(":reservationTime", $reservation_time , PDO::PARAM_INT);
-            $preparedSQL->bindValue(":reservationService", $reservation_service, PDO::PARAM_STR);
-            $preparedSQL->bindValue(":customerReference", $user_refernce, PDO::PARAM_INT);
-            $preparedSQL->bindValue(":barber_id" , $barber_id, PDO::PARAM_INT);
+            $preparedSQL->bindValue(':reservationDate', $reservation_date, PDO::PARAM_STR);
+            $preparedSQL->bindValue(':reservationTime', $reservation_time , PDO::PARAM_INT);
+            $preparedSQL->bindValue(':reservationService', $reservation_service, PDO::PARAM_STR);
+            $preparedSQL->bindValue(':customerReference', $user_refernce, PDO::PARAM_INT);
+            $preparedSQL->bindValue(':barber_id' , $barber_id, PDO::PARAM_INT);
 
             if($preparedSQL->execute()){
                 return true;
@@ -51,10 +51,10 @@
 
         public function deleteReservation($reservationID){
 
-            $sql = "DELETE FROM reservations WHERE reservation_id = :reservationID";
+            $sql = 'DELETE FROM reservations WHERE reservation_id = :reservationID';
             $preparedSQL = $this->Dbh->prepare($sql);
 
-            $preparedSQL->bindValue(":reservationID" , (int)$reservationID, PDO::PARAM_INT);
+            $preparedSQL->bindValue(':reservationID' , (int)$reservationID, PDO::PARAM_INT);
 
             if($preparedSQL->execute()){
                 return true;
