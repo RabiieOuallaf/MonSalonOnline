@@ -21,37 +21,32 @@
 
             $query->bindValue(':userrefernce', $userRefernce, PDO::PARAM_STR);
      
-            if(!$query->execute()){
+            $query->execute();
+            if(!$query->rowCount() > 0){
                 error_log("Error in banding the params : " . $query->errorInfo());
                 return false;
             }else {
             
-                $user = $query->fetch(PDO::FETCH_ASSOC);
-
-                if(!is_null($user)){
-                    return $user;
-                }else{
-                    return false;
-                }
+                return true;
                     
             }            
             
         }
 
-        // ===  Creating session === //
+        // // ===  Creating session === //
 
-        protected function createSession($user) {
-            session_start();
+        // protected function createSession($user) {
+        //     session_start();
 
-            $_SESSION["Username"] = $user->user_name;
-            if($user->user_role == "Admin"){
-                $_SESSION["Role"] = $user->user_role;
-                header("location: dashbaord.php");
-            }else{
-                header("location: index.php");
-            }
+        //     $_SESSION["Username"] = $user->user_name;
+        //     if($user->user_role == "Admin"){
+        //         $_SESSION["Role"] = $user->user_role;
+        //         header("location: dashbaord.php");
+        //     }else{
+        //         header("location: index.php");
+        //     }
 
-        }
+        // }
 
         
         
@@ -124,11 +119,12 @@
                     if($user){
                         echo json_encode(array('status' => 'success', 'user' => $user));
                     }else {
-                        http_response_code(404);
+                        http_response_code(400);
                         echo json_encode(array('status' => 'User does not exsit !'));
                         
                     }
                 }else{
+                    http_response_code(500);
                     echo json_encode("please fill out all inputs");
                 }
                 break;
