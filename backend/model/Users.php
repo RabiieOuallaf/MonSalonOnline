@@ -56,17 +56,19 @@
         
         
         
-        public function register($userName, $userEmail, $userPwd){
+        public function register($userName, $userEmail, $userPwd,$userPhoneNmuber){
             
             
-            $sql = "INSERT INTO users(user_name,user_email,user_pwd,user_refernce) VALUES (:username, :useremail, :userpwd, :userrefernce)";
+            $sql = "INSERT INTO users(user_name,user_email,user_pwd,user_refernce,user_role,user_phone_number) VALUES (:username, :useremail, :userpwd, :userrefernce,:user_role,:user_phone_number)";
 
             $query = $this->Dbh->prepare($sql);
 
             $query->bindValue(":username", $userName, PDO::PARAM_STR);
             $query->bindValue(":useremail", $userEmail, PDO::PARAM_STR);
             $query->bindValue(":userpwd", $userPwd, PDO::PARAM_STR);
+            $query->bindValue(":user_phone_number", (int)$userPhoneNmuber, PDO::PARAM_INT);
             $query->bindValue(":userrefernce" , $this->generateKey(), PDO::PARAM_STR);
+            $query->bindValue(":user_role", 'client', PDO::PARAM_STR);
 
             $userRegisterd = $query->execute();
             
@@ -131,8 +133,8 @@
                 }
                 break;
             case 'register':
-                if(isset($_POST['Email']) || !empty($_POST['username']) || !empty($_POST['pwd'])){
-                    $user = $User->register($_POST['username'] , $_POST['Email'] , $_POST['pwd']);
+                if(isset($_POST['Email']) || !empty($_POST['username']) || !empty($_POST['password'] || !empty($_POST['phoneNumber']))){
+                    $user = $User->register($_POST['username'] , $_POST['Email'] , $_POST['password'], $_POST['phoneNumber']);
 
                     if($user){
                        $userReference = $User->userReferneceKey($_POST['Email']);
