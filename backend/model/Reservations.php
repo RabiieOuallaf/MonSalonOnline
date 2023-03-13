@@ -1,11 +1,12 @@
 <?php 
-
-    include_once '../core/Database.php';
-
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
-
+       header("Access-Control-Allow-Origin: *");
+       header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+       header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+    if(file_exists('../core/Database.php')){
+        require_once '../core/Database.php';
+    }else{
+        require_once 'core/Database.php';
+    }
 
     class Reservations extends Database{
 
@@ -86,16 +87,16 @@
         public function displayAvialbleHours($day){
             $sql = "SELECT hour_value FROM full_schedule WHERE day_id = :day_id";
             $preparedSQL = $this->Dbh->prepare($sql);
-            $preparedSQL->bindValue(':day_id', $day, PDO::PARAM_INT);
+            $preparedSQL->bindValue(':day_id', (int)$day, PDO::PARAM_INT);
             if($preparedSQL->execute()){
-                echo json_encode($preparedSQL->fetch(PDO::FETCH_OBJ));
+                return $preparedSQL->fetchAll(PDO::FETCH_OBJ);
             }else {
-                echo json_encode('Something went wrong , please try later');
+                echo ('Something went wrong , please try later');
             }
         }
     }
 
-    $Reservation = new Reservations;
+    $Reservation = new Reservations();
 
     if($_SERVER["REQUEST_METHOD"] === "POST"){
 
@@ -148,25 +149,31 @@
                     }
                 }
                 break;
-            case 'getWorkingHours': 
-                if(isset($_POST['reservationDay'])){
-                    $avialbleReservationHours = $Reservation->displayAvialbleHours($_POST['reservationHours']);
-
-                    if($avialbleReservationHours) {
-                        http_response_code(200);
-                        echo json_encode(array("hours" => $avialbleReservationHours));
-                    }else {
-                        http_response_code(400);
-                        echo json_encode("There's no avialble hours !");
-                    }
-                }
 
             default :
                 $Reservation->displayReservations();
                 break;
                 
         }
-    }
+    }else if($_SERVER['REQUEST_METHOD'] === 'GET'){
+                if(isset($_GET['reservationDay'])){
+                    $avialbleReservationHours = $Reservation->displayAvialbleHours($_GET['reservationDay']);
+                    
+                    if($avialbleReservationHours){
+                        http_response_code(200);
+                        echo json_encode(array("hours" => $avialbleReservationHours));
+                    }else {
+                        http_response_code(400);
+                        echo json_encode("There's no avialble hours !");
+                    }
+                }else{
+                    echo json_encode('The GET params are not avialble , please try another parameters');
+                    http_response_code(404);
+                }
+        }
+    
+
+
 
     
 
