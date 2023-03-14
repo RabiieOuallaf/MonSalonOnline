@@ -10,15 +10,16 @@
 
         // === setResrvation === // 
 
-        public function setReservation($user_refernce, $reservation_service,$reservation_date,$barber_id) {
+        public function setReservation($user_refernce, $reservation_service,$reservation_date,$barber_id,$reservatioDateDay) {
 
-            $sql = "INSERT INTO reservations(reservation_date, reservation_service, reservation_customer_reference, reservation_barber_id) VALUES (:reservationDate, :reservationService , :customerReference, :barber_id)";
+            $sql = "INSERT INTO reservations(reservation_date, reservation_service, reservation_customer_reference, reservation_barber_id, reservation_date_day) VALUES (:reservationDate, :reservationService , :customerReference, :barber_id, :reservatioDateDay)";
 
             $preparedSQL = $this->Dbh->prepare($sql);
             
             $preparedSQL->bindValue(":reservationDate", (int)$reservation_date, PDO::PARAM_INT);
             $preparedSQL->bindValue(":reservationService", $reservation_service, PDO::PARAM_STR);
             $preparedSQL->bindValue(":customerReference", $user_refernce, PDO::PARAM_STR);
+            $preparedSQL->bindValue(":reservationDate", (int)$reservatioDateDay, PDO::PARAM_INT);
             $preparedSQL->bindValue(":barber_id" , $barber_id, PDO::PARAM_INT);
 
             $preparedSQL->execute();

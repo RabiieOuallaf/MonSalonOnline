@@ -15,9 +15,9 @@
             $this->ReservationModel = new Reservation();
         }
         // === Add a reservation === //
-        public function setReservation($customerReference, $reservationService, $reservationDate, $barberID) 
+        public function setReservation($customerReference, $reservationService, $reservationDate, $barberID,$reservatioDateDay) 
         {
-            $setReservation = $this->ReservationModel->setReservation($customerReference, $reservationService, $reservationDate, $barberID);
+            $setReservation = $this->ReservationModel->setReservation($customerReference, $reservationService, $reservationDate, $barberID, $reservatioDateDay);
             if($setReservation) {
                 return true;
             }else{
@@ -66,9 +66,9 @@
 
             case "setReservation":
 
-                if(isset($_POST["reservationDate"]) && isset($_POST["reservationService"]) && isset($_POST["customerRefernce"]) && isset($_POST["barberID"])){
+                if(isset($_POST["reservationDate"]) && isset($_POST["reservationService"]) && isset($_POST["customerRefernce"]) && isset($_POST["barberID"]) && isset($_POST['reservatioDateDay'])){
 
-                    $setReservation = $Reservation->setReservation($_POST["customerRefernce"],$_POST["reservationService"],$_POST["reservationDate"],$_POST["barberID"]);
+                    $setReservation = $Reservation->setReservation($_POST["customerRefernce"],$_POST["reservationService"],$_POST["reservationDate"],$_POST["barberID"], $_POST['reservatioDateDay']);
 
                     if($setReservation){
                         http_response_code(201);
