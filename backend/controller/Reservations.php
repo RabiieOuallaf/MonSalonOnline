@@ -71,8 +71,8 @@
                     $setReservation = $Reservation->setReservation($_POST["customerRefernce"],$_POST["reservationService"],$_POST["reservationDate"],$_POST["barberID"]);
 
                     if($setReservation){
-                        http_response_code(200);
-                        echo json_encode(array("status" => "reservation has been made seccessfully" , "reservation" => $setReservation));
+                        http_response_code(201);
+                        echo json_encode(array("status" => "reservation has been made seccessfully"));
                     }else {
                         http_response_code(500);
                         echo json_encode(array("status" => "reservation setting has faild"));
@@ -84,7 +84,7 @@
 
                 if(isset($_POST['reservationDate'])&& isset($_POST['reservationService']) && isset($_POST['customerRefernce']) && isset($_POST['barberID'])){
 
-                    $updateReservation = $Reservation->updateReservation($_POST['customerRefernce'],$_POST['reservationService'],$_POST['reservationDate'],$_POST['barberID'], $_POST['reservationId']);
+                    $updateReservation = $Reservation->updateReservation($_POST['customerRefernce'],$_POST['reservationService'],(int)$_POST['reservationDate'],$_POST['barberID'], $_POST['reservationId']);
 
                     if($updateReservation){
                         http_response_code(200);

@@ -16,12 +16,13 @@
 
             $preparedSQL = $this->Dbh->prepare($sql);
             
-            $preparedSQL->bindValue(":reservationDate", $reservation_date, PDO::PARAM_STR);
+            $preparedSQL->bindValue(":reservationDate", (int)$reservation_date, PDO::PARAM_INT);
             $preparedSQL->bindValue(":reservationService", $reservation_service, PDO::PARAM_STR);
-            $preparedSQL->bindValue(":customerReference", $user_refernce, PDO::PARAM_INT);
+            $preparedSQL->bindValue(":customerReference", $user_refernce, PDO::PARAM_STR);
             $preparedSQL->bindValue(":barber_id" , $barber_id, PDO::PARAM_INT);
 
-            if($preparedSQL->execute()){
+            $preparedSQL->execute();
+            if($preparedSQL->rowCount() > 0){
                 return true;
             }else{
                 return false;
