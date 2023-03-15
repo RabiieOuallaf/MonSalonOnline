@@ -12,25 +12,43 @@
 
         public function setReservation($user_refernce, $reservation_service,$reservation_date,$barber_id,$reservatioDateDay) {
 
-            $sql = "INSERT INTO reservations(reservation_date, reservation_service, reservation_customer_reference, reservation_barber_id, reservation_date_day) VALUES (:reservationDate, :reservationService , :customerReference, :barber_id, :reservatioDateDay)";
+            $sql = "INSERT INTO reservations(reservation_date,reservation_service,reservation_customer_reference,reservation_barber_id,reservation_date_day)VALUES(:reservationDate,:reservationService,:customerReference,:barber_id,:reservatioDateDay)";
 
             $preparedSQL = $this->Dbh->prepare($sql);
             
             $preparedSQL->bindValue(":reservationDate", (int)$reservation_date, PDO::PARAM_INT);
             $preparedSQL->bindValue(":reservationService", $reservation_service, PDO::PARAM_STR);
             $preparedSQL->bindValue(":customerReference", $user_refernce, PDO::PARAM_STR);
-            $preparedSQL->bindValue(":reservationDate", (int)$reservatioDateDay, PDO::PARAM_INT);
+            $preparedSQL->bindValue(":reservatioDateDay", (int)$reservatioDateDay, PDO::PARAM_INT);
             $preparedSQL->bindValue(":barber_id" , $barber_id, PDO::PARAM_INT);
 
             $preparedSQL->execute();
             if($preparedSQL->rowCount() > 0){
-                return true;
+                $updateReservationStatus = $this->updateReservationStatus($reservatioDateDay, $reservation_date);
+                if($updateReservationStatus){
+                    return true; 
+                }
             }else{
                 return false;
             }
             
         } 
+        // === Update hour status from free to hold === // 
+        public function updateReservationStatus($reservatioDateDay, $reservation_date) {
+            $sql = "UPDATE full_schedule SET hour_availability = :hour_status WHERE day_id = :day_id AND hour_value = :hour_value";
+            $preparedSQL = $this->Dbh->prepare($sql);
+            $preparedSQL->bindValue(':hour_status', 'hold', PDO::PARAM_STR);
+            $preparedSQL->bindValue(':day_id', $reservatioDateDay, PDO::PARAM_INT);
+            $preparedSQL->bindValue(':hour_value', $reservation_date, PDO::PARAM_INT);
 
+            $executedSQL = $preparedSQL->execute();
+            if($executedSQL) {
+                return true;
+            }else {
+                return false;
+            }
+           
+        }
         // === updateReservation === //
 
         public function updateReservation($user_refernce, $reservation_service,$reservation_date,$reservation_id,$barber_id) {
@@ -84,13 +102,28 @@
         // === Get avialble days === // 
 
         public function displayAvialbleHours($day){
-            $sql = "SELECT hour_value FROM full_schedule WHERE day_id = :day_id";
+            $sql = "SELECT hour_value,hour_availability FROM full_schedule WHERE day_id = :day_id";
             $preparedSQL = $this->Dbh->prepare($sql);
             $preparedSQL->bindValue(':day_id', (int)$day, PDO::PARAM_INT);
             if($preparedSQL->execute()){
                 return $preparedSQL->fetchAll(PDO::FETCH_OBJ);
             }else {
                 echo ('Something went wrong , please try later');
+            }
+        }
+        
+
+        // === Display user's reservations === // 
+
+        public function displayUserReservations($usetToken) 
+        {
+            $sql = "SELECT * FROM reservations WHERE reservation_costumer_reference = :reservation_costumer_reference";
+            $preparedSQL = $this->Dbh->prepare($sql);
+            $preparedSQL->bindValue(':reservation_costumer_reference', $usetToken, PDO::PARAM_STR);
+            if($preparedSQL->execute()) {
+                return $preparedSQL->fetchAll(PDO::FETCH_OBJ);
+            }else{
+                echo ("This user doesn't have any reservations for the moment!");
             }
         }
     }

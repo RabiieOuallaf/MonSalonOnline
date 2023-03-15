@@ -55,6 +55,11 @@
         {
             return $this->ReservationModel->displayAvialbleHours($day);
         }
+        // === Display User's reservations === // 
+        public function displayUserReservations($userToken) {
+            return $this->ReservationModel->displayUserReservations($userToken);
+        }
+
 
     }
 
@@ -111,7 +116,6 @@
                     }
                 }
                 break;
-
             default :
                 $Reservation->displayReservations();
                 break;
@@ -120,7 +124,6 @@
     }else if($_SERVER['REQUEST_METHOD'] === 'GET'){
         if(isset($_GET['reservationDay'])){
             $avialbleReservationHours = $Reservation->displayAvialbleHours($_GET['reservationDay']);
-            
             if($avialbleReservationHours){
                 http_response_code(200);
                 echo json_encode(array("hours" => $avialbleReservationHours));
